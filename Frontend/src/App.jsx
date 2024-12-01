@@ -1,15 +1,13 @@
-import Navbar from "./components/Navbar"
-import Hero from "./Hero"
+import React from "react";
+import AuthProvider from "./context/AuthContext";
+import AppRouter from "../router";
 
-
-function App() {
-
+const App = () => {
   return (
-    <>
-      <Navbar/>
-      <Hero/>
-    </>
-  )
-}
+    <AuthProvider>
+      <AppRouter />
+    </AuthProvider>
+  );
+};
 
-export default App
+export default App;
