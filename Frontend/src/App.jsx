@@ -1,50 +1,42 @@
 import { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
-import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
 
 function App() {
   const [todo, setTodo] = useState("");
   const [taskArray, setTaskArray] = useState([]);
-  const [showFinished, setshowFinished] = useState(true);
+  const [showFinished, setShowFinished] = useState(true);
 
+  // Fetch tasks from the backend
   useEffect(() => {
-    let todoString = localStorage.getItem("taskArray");
-    if (todoString) {
-      let taskArray = JSON.parse(localStorage.getItem("taskArray"));
-      setTaskArray(taskArray);
-    }
+    axios.get("http://localhost:5000/tasks").then((response) => {
+      setTaskArray(response.data);
+    });
   }, []);
 
-  const saveToLS = () => {
-    localStorage.setItem("taskArray", JSON.stringify(taskArray));
-  };
-
   const toggleFinished = () => {
-    setshowFinished(!showFinished);
+    setShowFinished(!showFinished);
   };
 
-  const handleEdit = (id) => {
-    let t = taskArray.filter((i) => i.id === id);
-    setTodo(t[0].todo);
-    let newTask = taskArray.filter((task) => {
-      return task.id !== id;
-    });
-    setTaskArray(newTask);
-    saveToLS();
+  const handleEdit = (e, id) => {
+    const t = taskArray.find((task) => task._id === id);
+    setTodo(t.todo);
+    handleDelete(e, id); // Remove the task to update it after editing
   };
 
-  const handleDelete = (id) => {
-    let newTask = taskArray.filter((task) => {
-      return task.id !== id;
+  const handleDelete = (e, id) => {
+    axios.delete(`http://localhost:5000/tasks/${id}`).then(() => {
+      setTaskArray(taskArray.filter((task) => task._id !== id));
     });
-    setTaskArray(newTask);
-    saveToLS();
   };
 
   const handleAdd = () => {
-    setTaskArray([...taskArray, { id: uuidv4(), todo, isCompleted: false }]);
-    setTodo("");
-    saveToLS();
+    if (todo.trim() === "") return; // Prevent adding empty tasks
+    const newTask = { todo, isCompleted: false };
+    axios.post("http://localhost:5000/tasks", newTask).then((response) => {
+      setTaskArray([...taskArray, response.data]);
+      setTodo("");
+    });
   };
 
   const handleChange = (e) => {
@@ -52,31 +44,34 @@ function App() {
   };
 
   const handleCheckbox = (e) => {
-    let id = e.target.name;
-    let index = taskArray.findIndex((task) => {
-      return task.id === id;
+    const id = e.target.name;
+    const task = taskArray.find((task) => task._id === id);
+    const updatedTask = { ...task, isCompleted: !task.isCompleted };
+
+    axios.put(`http://localhost:5000/tasks/${id}`, updatedTask).then((response) => {
+      setTaskArray(
+        taskArray.map((task) =>
+          task._id === id ? response.data : task
+        )
+      );
     });
-    let newTask = [...taskArray];
-    newTask[index].isCompleted = !newTask[index].isCompleted;
-    setTaskArray(newTask);
-    saveToLS();
   };
 
   return (
     <>
       <Navbar />
-
       <h1 className="font-bold text-center text-3xl">
-        iTask - Manage your taskArray at one place
+        iTask - Manage your tasks in one place
       </h1>
       <div className="addTodo my-5 flex flex-col gap-4">
         <h2 className="text-2xl font-bold">Add a Todo</h2>
-        <div className="flex">
+        <div className="flex ">
           <input
+            
             onChange={handleChange}
             value={todo}
             type="text"
-            className="w-full rounded-full px-5 py-1"
+            className="w-full rounded-full px-5 py-1 border border-black"
           />
           <button
             onClick={handleAdd}
@@ -99,8 +94,8 @@ function App() {
       <div className="h-[1px] bg-black opacity-15 w-[90%] mx-auto my-2"></div>
       <h2 className="text-2xl font-bold">Your Todos</h2>
       <div className="taskArray">
-
-        {taskArray.length === 0 ? (
+        {taskArray.length === 0 ||
+        (!showFinished && taskArray.every((task) => task.isCompleted)) ? (
           <div className="text-center mt-4">No Tasks to show</div>
         ) : (
           <div className="flex justify-center px-4">
@@ -131,7 +126,7 @@ function App() {
                       key={task.id}
                       className={`hover:bg-gray-50 ${
                         task.isCompleted ? "opacity-50" : ""
-                      }`} // Apply transparency to completed tasks
+                      }`}
                     >
                       <td className="border border-gray-300 text-center">
                         <label className="flex items-center justify-center">

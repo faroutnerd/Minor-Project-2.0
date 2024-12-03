@@ -42,13 +42,12 @@ const Navbar = () => {
             icon={isOpen ? faTimes : faBars}
             className="w-6 h-6"
           />
-          
         </button>
       </div>
 
       {/* For small screens */}
       {isOpen && (
-        <div style={{backgroundColor: '#279EFF'}} className="md:hidden">
+        <div style={{ backgroundColor: "#279EFF" }} className="md:hidden">
           <a href="/" className="block px-4 py-2">
             Data-1
           </a>
