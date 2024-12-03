@@ -42,6 +42,7 @@ const Navbar = () => {
             icon={isOpen ? faTimes : faBars}
             className="w-6 h-6"
           />
+          
         </button>
       </div>
 
