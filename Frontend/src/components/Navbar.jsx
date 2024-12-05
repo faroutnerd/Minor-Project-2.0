@@ -1,66 +1,39 @@
-import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { useState, useEffect } from "react";
+import Logo from "./Logo";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [currentDateTime, setCurrentDateTime] = useState("");
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
+  useEffect(() => {
+    const updateDateTime = () => {
+      const now = new Date();
+      const months = [
+        "January", "February", "March", "April", "May", "June", 
+        "July", "August", "September", "October", "November", "December"
+      ];;
+      const day = now.getDate();
+      const month = months[now.getMonth()];
+      const year = now.getFullYear();
+      const time = now.toLocaleTimeString();
+      setCurrentDateTime(`${month} ${day} ${year} ${time}`);
+    };
+
+    // Update time every second
+    const intervalId = setInterval(updateDateTime, 1000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
-    <nav style={{ backgroundColor: "#0C356A" }} className="text-white">
-      <div className="container mx-auto px-4 flex justify-between items-center py-4">
-        {/* Logo */}
-        <div className="text-xl font-bold">
-          <a href="/">
-            <div className="logo font-bold text-2xl">
-              <span style={{ color: "#40F8FF" }}>&lt;</span>
-              Todo
-              <span style={{ color: "#40F8FF" }}>List/&gt;</span>
-            </div>
-          </a>
-        </div>
-
-        {/* For bigger screen */}
-        <div className="hidden md:flex space-x-6">
-          <a href="/" className="">
-            Data-1
-          </a>
-          <a href="/" className="">
-            Data-2
-          </a>
-          <a href="/" className="">
-            Data-3
-          </a>
-        </div>
-
-        {/* Hamburger menu for mobile */}
-        <button className="md:hidden focus:outline-none" onClick={toggleMenu}>
-          <FontAwesomeIcon
-            icon={isOpen ? faTimes : faBars}
-            className="w-6 h-6"
-          />
-        </button>
-      </div>
-
-      {/* For small screens */}
-      {isOpen && (
-        <div style={{ backgroundColor: "#279EFF" }} className="md:hidden">
-          <a href="/" className="block px-4 py-2">
-            Data-1
-          </a>
-          <a href="/" className="block px-4 py-2">
-            Data-2
-          </a>
-          <a href="/" className="block px-4 py-2">
-            Data-3
-          </a>
-        </div>
-      )}
+    <nav
+      style={{ backgroundColor: "#0C356A" }}
+      className="text-white p-4 text-center"
+    >
+      <Logo />
+      <div className="mt-2 text-sm">{currentDateTime}</div>
     </nav>
   );
 };
 
-export default Navbar;
+export default Navbar;

@@ -6,6 +6,7 @@ function App() {
   const [todo, setTodo] = useState("");
   const [taskArray, setTaskArray] = useState([]);
   const [showFinished, setShowFinished] = useState(true);
+  const [dueTime, setDueTime] = useState(null);
 
   // Fetch tasks from the backend
   useEffect(() => {
@@ -30,12 +31,22 @@ function App() {
     });
   };
 
+  // const handleAdd = () => {
+  //   if (todo.trim() === "") return; // Prevent adding empty tasks
+  //   const newTask = { todo, isCompleted: false };
+  //   axios.post("http://localhost:5000/tasks", newTask).then((response) => {
+  //     setTaskArray([...taskArray, response.data]);
+  //     setTodo("");
+  //   });
+  // };
+
   const handleAdd = () => {
     if (todo.trim() === "") return; // Prevent adding empty tasks
-    const newTask = { todo, isCompleted: false };
+    const newTask = { todo, isCompleted: false, dueDate: dueTime || null }; // dueTime is already a date
     axios.post("http://localhost:5000/tasks", newTask).then((response) => {
       setTaskArray([...taskArray, response.data]);
       setTodo("");
+      setDueTime(null);
     });
   };
 
@@ -48,34 +59,48 @@ function App() {
     const task = taskArray.find((task) => task._id === id);
     const updatedTask = { ...task, isCompleted: !task.isCompleted };
 
-    axios.put(`http://localhost:5000/tasks/${id}`, updatedTask).then((response) => {
-      setTaskArray(
-        taskArray.map((task) =>
-          task._id === id ? response.data : task
-        )
-      );
-    });
+    axios
+      .put(`http://localhost:5000/tasks/${id}`, updatedTask)
+      .then((response) => {
+        setTaskArray(
+          taskArray.map((task) => (task._id === id ? response.data : task))
+        );
+      });
   };
 
   return (
     <>
       <Navbar />
-      <h1 className="font-bold text-center text-3xl">
-        iTask - Manage your tasks in one place
-      </h1>
+
       <div className="addTodo my-5 flex flex-col gap-4">
-        <h2 className="text-2xl font-bold">Add a Todo</h2>
-        <div className="flex ">
+        <h2 className="text-2xl font-bold">Add a Task </h2>
+        <div className="flex">
           <input
-            
             onChange={handleChange}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleAdd();
+              }
+            }}
             value={todo}
             type="text"
-            className="w-full rounded-full px-5 py-1 border border-black"
+            className="w-[85%] rounded-full px-5 py-1 border border-black"
           />
+          <div className="flex flex-col gap-2">
+            <label htmlFor="dueDate" className="font-medium">
+              Due Date (optional):
+            </label>
+            <input
+              type="date" // Changed to date
+              id="dueDate"
+              className="w-[85%] rounded-full px-5 py-1 border border-black"
+              onChange={(e) => setDueDate(e.target.value)} // No need to parse time
+            />
+          </div>
+
           <button
             onClick={handleAdd}
-            className="bg-violet-800 mx-2 rounded-full hover:bg-violet-950 disabled:bg-violet-500 p-4 py-2 text-sm font-bold text-white"
+            className="bg-violet-800 mx-2 rounded-full hover:bg-violet-950 disabled:bg-violet-500 p-4 py-2 text-xl font-bold text-white w-52"
           >
             Save
           </button>
@@ -109,6 +134,10 @@ function App() {
                     Task
                   </th>
                   <th className="border border-gray-300 py-2 px-4 text-center">
+                    Due Date
+                  </th>{" "}
+                  {/* New column */}
+                  <th className="border border-gray-300 py-2 px-4 text-center">
                     Edit Task
                   </th>
                   <th className="border border-gray-300 py-2 px-4 text-center">
@@ -116,6 +145,7 @@ function App() {
                   </th>
                 </tr>
               </thead>
+
               <tbody>
                 {taskArray.map((task) => {
                   if (!showFinished && task.isCompleted) {
@@ -123,7 +153,7 @@ function App() {
                   }
                   return (
                     <tr
-                      key={task.id}
+                      key={task._id}
                       className={`hover:bg-gray-50 ${
                         task.isCompleted ? "opacity-50" : ""
                       }`}
@@ -131,7 +161,7 @@ function App() {
                       <td className="border border-gray-300 text-center">
                         <label className="flex items-center justify-center">
                           <input
-                            name={task.id}
+                            name={task._id}
                             onChange={handleCheckbox}
                             type="checkbox"
                             checked={task.isCompleted}
@@ -142,8 +172,22 @@ function App() {
                       <td className="border border-gray-300 text-left py-2 px-4">
                         {task.todo}
                       </td>
+                      <td className="border border-gray-300 text-left py-2 px-4">
+                        {task.dueDate
+                          ? new Date(task.dueDate).toLocaleDateString() // Display only the date
+                          : "—"}
+                      </td>
+
                       <td className="border border-gray-300 text-center">
-                        <button onClick={(e) => handleEdit(e, task.id)}>
+                        <button
+                          onClick={(e) => handleEdit(e, task._id)}
+                          disabled={task.isCompleted}
+                          className={`${
+                            task.isCompleted
+                              ? "opacity-50 cursor-not-allowed"
+                              : "hover:opacity-80"
+                          }`}
+                        >
                           <img
                             src={"../src/assets/edit.png"}
                             alt="Edit"
@@ -152,7 +196,12 @@ function App() {
                         </button>
                       </td>
                       <td className="border border-gray-300 text-center">
-                        <button onClick={(e) => handleDelete(e, task.id)}>
+                        <button
+                          onClick={(e) => handleDelete(e, task._id)}
+                          className={`hover:opacity-100 ${
+                            task.isCompleted ? "opacity-50" : "opacity-100"
+                          }`}
+                        >
                           <img
                             src={"../src/assets/trash.png"}
                             alt="Delete"

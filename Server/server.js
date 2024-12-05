@@ -18,11 +18,12 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
-// Define Mongoose Schema and Model
 const taskSchema = new mongoose.Schema({
   todo: { type: String, required: true },
   isCompleted: { type: Boolean, default: false },
+  dueDate: { type: Date, default: null }, // Date format
 });
+
 
 const Task = mongoose.model("Task", taskSchema);
 
@@ -41,7 +42,12 @@ app.get("/tasks", async (req, res) => {
 // Add a new task
 app.post("/tasks", async (req, res) => {
   try {
-    const newTask = new Task(req.body);
+    const { todo, isCompleted, dueDate } = req.body;
+    const newTask = new Task({
+      todo,
+      isCompleted,
+      dueDate: dueDate ? new Date(dueDate) : null,
+    });
     const savedTask = await newTask.save();
     res.json(savedTask);
   } catch (err) {
@@ -52,9 +58,16 @@ app.post("/tasks", async (req, res) => {
 // Update a task (edit or toggle completion)
 app.put("/tasks/:id", async (req, res) => {
   try {
-    const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const { todo, isCompleted, dueDate } = req.body;
+    const updatedTask = await Task.findByIdAndUpdate(
+      req.params.id,
+      {
+        todo,
+        isCompleted,
+        dueDate: dueDate ? new Date(dueDate) : null,
+      },
+      { new: true }
+    );
     res.json(updatedTask);
   } catch (err) {
     res.status(500).send(err.message);
