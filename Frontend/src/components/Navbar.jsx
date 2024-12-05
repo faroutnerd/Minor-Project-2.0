@@ -25,6 +25,10 @@ const Navbar = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  const handleLogin = () => {
+    navigate("/login")
+  }
+
   return (
     <nav
       style={{ backgroundColor: "#0C356A" }}
@@ -32,6 +36,11 @@ const Navbar = () => {
     >
       <Logo />
       <div className="mt-2 text-sm">{currentDateTime}</div>
+      <div>
+        <button onClick={handleLogin} >
+          Login
+        </button>
+      </div>
     </nav>
   );
 };
