@@ -6,7 +6,6 @@ function App() {
   const [todo, setTodo] = useState("");
   const [taskArray, setTaskArray] = useState([]);
   const [showFinished, setShowFinished] = useState(true);
-  const [dueTime, setDueTime] = useState(null);
 
   // Fetch tasks from the backend
   useEffect(() => {
@@ -31,22 +30,12 @@ function App() {
     });
   };
 
-  // const handleAdd = () => {
-  //   if (todo.trim() === "") return; // Prevent adding empty tasks
-  //   const newTask = { todo, isCompleted: false };
-  //   axios.post("http://localhost:5000/tasks", newTask).then((response) => {
-  //     setTaskArray([...taskArray, response.data]);
-  //     setTodo("");
-  //   });
-  // };
-
   const handleAdd = () => {
     if (todo.trim() === "") return; // Prevent adding empty tasks
-    const newTask = { todo, isCompleted: false, dueDate: dueTime || null }; // dueTime is already a date
+    const newTask = { todo, isCompleted: false };
     axios.post("http://localhost:5000/tasks", newTask).then((response) => {
       setTaskArray([...taskArray, response.data]);
       setTodo("");
-      setDueTime(null);
     });
   };
 
@@ -73,7 +62,7 @@ function App() {
       <Navbar />
 
       <div className="addTodo my-5 flex flex-col gap-4">
-        <h2 className="text-2xl font-bold">Add a Task </h2>
+        <h2 className="text-2xl font-bold">Add a Task</h2>
         <div className="flex">
           <input
             onChange={handleChange}
@@ -84,20 +73,9 @@ function App() {
             }}
             value={todo}
             type="text"
+            placeholder="Enter your task"
             className="w-[85%] rounded-full px-5 py-1 border border-black"
           />
-          <div className="flex flex-col gap-2">
-            <label htmlFor="dueDate" className="font-medium">
-              Due Date (optional):
-            </label>
-            <input
-              type="date" // Changed to date
-              id="dueDate"
-              className="w-[85%] rounded-full px-5 py-1 border border-black"
-              onChange={(e) => setDueDate(e.target.value)} // No need to parse time
-            />
-          </div>
-
           <button
             onClick={handleAdd}
             className="bg-violet-800 mx-2 rounded-full hover:bg-violet-950 disabled:bg-violet-500 p-4 py-2 text-xl font-bold text-white w-52"
@@ -106,6 +84,7 @@ function App() {
           </button>
         </div>
       </div>
+
       <input
         className="my-4"
         id="show"
@@ -133,10 +112,6 @@ function App() {
                   <th className="border border-gray-300 py-2 px-4 text-left w-1/2">
                     Task
                   </th>
-                  <th className="border border-gray-300 py-2 px-4 text-center">
-                    Due Date
-                  </th>{" "}
-                  {/* New column */}
                   <th className="border border-gray-300 py-2 px-4 text-center">
                     Edit Task
                   </th>
@@ -172,12 +147,6 @@ function App() {
                       <td className="border border-gray-300 text-left py-2 px-4">
                         {task.todo}
                       </td>
-                      <td className="border border-gray-300 text-left py-2 px-4">
-                        {task.dueDate
-                          ? new Date(task.dueDate).toLocaleDateString() // Display only the date
-                          : "—"}
-                      </td>
-
                       <td className="border border-gray-300 text-center">
                         <button
                           onClick={(e) => handleEdit(e, task._id)}
