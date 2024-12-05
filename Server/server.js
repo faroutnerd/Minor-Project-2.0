@@ -2,7 +2,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const bcrypt = require("bcrypt");
 
 const app = express();
 
@@ -19,69 +18,178 @@ mongoose
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
+// Task Schema
 const taskSchema = new mongoose.Schema({
   todo: { type: String, required: true },
   isCompleted: { type: Boolean, default: false },
-  dueDate: { type: Date, default: null }, // Date format
 });
 
+// User Schema
+const userSchema = new mongoose.Schema({
+  phone: { type: String, unique: true, required: true },
+  password: { type: String, required: true }, // Plain password
+  securityQuestion: { type: String, required: true },
+  securityAnswer: { type: String, required: true },
+  tasks: [taskSchema], // Each user has their own set of tasks
+});
 
+// Models
 const Task = mongoose.model("Task", taskSchema);
+const User = mongoose.model("User", userSchema);
 
 // API Routes
 
-// Get all tasks
-app.get("/tasks", async (req, res) => {
+// User Signup
+app.post("/signup", async (req, res) => {
   try {
-    const tasks = await Task.find();
-    res.json(tasks);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
+    const { phone, password, securityQuestion, securityAnswer } = req.body;
 
-// Add a new task
-app.post("/tasks", async (req, res) => {
-  try {
-    const { todo, isCompleted, dueDate } = req.body;
-    const newTask = new Task({
-      todo,
-      isCompleted,
-      dueDate: dueDate ? new Date(dueDate) : null,
+    // Check if phone number is unique
+    const existingUser = await User.findOne({ phone });
+    if (existingUser) {
+      return res.status(400).json({ message: "Phone number already exists" });
+    }
+
+    // Create new user
+    const newUser = new User({
+      phone,
+      password, // Save plain password
+      securityQuestion,
+      securityAnswer,
     });
-    const savedTask = await newTask.save();
-    res.json(savedTask);
+    await newUser.save();
+    res.status(201).json({ message: "User signed up successfully" });
   } catch (err) {
-    res.status(500).send(err.message);
+    res.status(500).json({ message: err.message });
   }
 });
 
-// Update a task (edit or toggle completion)
-app.put("/tasks/:id", async (req, res) => {
+// User Login
+app.post("/login", async (req, res) => {
   try {
-    const { todo, isCompleted, dueDate } = req.body;
-    const updatedTask = await Task.findByIdAndUpdate(
-      req.params.id,
-      {
-        todo,
-        isCompleted,
-        dueDate: dueDate ? new Date(dueDate) : null,
-      },
-      { new: true }
-    );
-    res.json(updatedTask);
+    const { phone, password } = req.body;
+
+    // Find user
+    const user = await User.findOne({ phone });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // Compare passwords
+    if (user.password !== password) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    res.status(200).json({ userId: user._id, message: "Login successful" });
   } catch (err) {
-    res.status(500).send(err.message);
+    res.status(500).json({ message: err.message });
   }
 });
 
-// Delete a task
-app.delete("/tasks/:id", async (req, res) => {
+// Change Password
+app.post("/change-password", async (req, res) => {
   try {
-    await Task.findByIdAndDelete(req.params.id);
+    const { phone, securityQuestion, securityAnswer, newPassword } = req.body;
+
+    // Find user
+    const user = await User.findOne({ phone });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // Validate security question and answer
+    if (
+      user.securityQuestion !== securityQuestion ||
+      user.securityAnswer !== securityAnswer
+    ) {
+      return res.status(400).json({ message: "Security question or answer is incorrect" });
+    }
+
+    // Update password
+    user.password = newPassword; // Save new plain password
+    await user.save();
+
+    res.status(200).json({ message: "Password changed successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get all tasks for a user
+app.get("/tasks/:userId", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user.tasks);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Add a task for a user
+app.post("/tasks/:userId", async (req, res) => {
+  try {
+    const { todo } = req.body;
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const newTask = new Task({ todo });
+    user.tasks.push(newTask);
+    await user.save();
+
+    res.json(newTask);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Update a task for a user
+app.put("/tasks/:userId/:taskId", async (req, res) => {
+  try {
+    const { todo, isCompleted } = req.body;
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const task = user.tasks.id(req.params.taskId);
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    task.todo = todo;
+    task.isCompleted = isCompleted;
+    await user.save();
+
+    res.json(task);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Delete a task for a user
+app.delete("/tasks/:userId/:taskId", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const task = user.tasks.id(req.params.taskId);
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    task.remove();
+    await user.save();
+
     res.sendStatus(204);
   } catch (err) {
-    res.status(500).send(err.message);
+    res.status(500).json({ message: err.message });
   }
 });
 

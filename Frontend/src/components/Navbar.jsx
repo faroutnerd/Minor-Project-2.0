@@ -1,43 +1,59 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Logo from "./Logo";
 
 const Navbar = () => {
   const [currentDateTime, setCurrentDateTime] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const updateDateTime = () => {
       const now = new Date();
       const months = [
-        "January", "February", "March", "April", "May", "June", 
-        "July", "August", "September", "October", "November", "December"
-      ];;
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
       const day = now.getDate();
       const month = months[now.getMonth()];
       const year = now.getFullYear();
       const time = now.toLocaleTimeString();
-      setCurrentDateTime(`${month} ${day} ${year} ${time}`);
+      setCurrentDateTime(`${month} ${day}, ${year} | ${time}`);
     };
 
-    // Update time every second
     const intervalId = setInterval(updateDateTime, 1000);
-
-    // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
   }, []);
-
-  const handleLogin = () => {
-    navigate("/login")
-  }
 
   return (
     <nav
       style={{ backgroundColor: "#0C356A" }}
-      className="text-white p-4 text-center"
+      className="flex justify-between items-center p-4 text-white shadow-lg"
     >
-      <Logo />
-      <div className="mt-2 text-sm">{currentDateTime}</div>
+      {/* Logo Section */}
+      <div className="flex items-center">
+        <Logo />
+        <span className="ml-4 text-lg font-semibold">My Application</span>
+      </div>
+
+      {/* Current Date and Time */}
+      <div className="text-sm">{currentDateTime}</div>
+
+      {/* Login Button */}
       <div>
-        <button onClick={handleLogin} >
+        <button
+          onClick={() => navigate("/login")}
+          className="px-6 py-2 text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300 rounded-md shadow-lg transition duration-300"
+        >
           Login
         </button>
       </div>
@@ -45,4 +61,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default Navbar;
