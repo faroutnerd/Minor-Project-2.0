@@ -7,7 +7,6 @@ const SignUp = () => {
     name: "",
     phone: "",
     password: "",
-    confirmPassword: "",
     securityQuestion: "",
     securityAnswer: "",
   });
@@ -17,36 +16,30 @@ const SignUp = () => {
   const validateInput = () => {
     const { name, phone, password, confirmPassword, securityAnswer } = formData;
 
-    // Validate name (at least 3 characters and no numbers or special characters)
     if (!/^[a-zA-Z\s]{3,}$/.test(name)) {
       return "Name must be at least 3 characters long and contain only letters.";
     }
 
-    // Validate phone (10 digits only)
-    if (!/^\d{10}$/.test(phone)) {
-      return "Phone number must be exactly 10 digits and contain only numbers.";
+    if (!/^[6-9]\d{9}$/.test(phone)) {
+      return "Invalid Phone number";
     }
 
-    // Validate password (at least 6 characters)
     if (password.length < 6) {
       return "Password must be at least 6 characters long.";
     }
 
-    // Confirm password match
     if (password !== confirmPassword) {
       return "Passwords do not match. Please try again.";
     }
 
-    // Validate security answer (at least 3 characters)
     if (securityAnswer.length < 3) {
       return "Security answer must be at least 3 characters long.";
     }
 
-    return null; // No errors
+    return null;
   };
 
   const handleSignUp = async () => {
-    // Validate inputs
     const error = validateInput();
     if (error) {
       setError(error);
@@ -54,9 +47,8 @@ const SignUp = () => {
     }
 
     try {
-      // Send data to backend
       await axios.post("http://localhost:5000/signup", formData);
-      navigate("/login");
+      // navigate("/login");
     } catch (err) {
       setError("Error signing up. Please try again.");
     }
@@ -76,7 +68,6 @@ const SignUp = () => {
           <p className="text-red-600 text-sm text-center mb-4">{error}</p>
         )}
         <div className="space-y-4">
-          {/* Name */}
           <input
             type="text"
             name="name"
@@ -85,7 +76,6 @@ const SignUp = () => {
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
           />
-          {/* Phone */}
           <input
             type="text"
             name="phone"
@@ -94,7 +84,6 @@ const SignUp = () => {
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
           />
-          {/* Password */}
           <input
             type="password"
             name="password"
@@ -103,16 +92,14 @@ const SignUp = () => {
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
           />
-          {/* Confirm Password */}
           <input
             type="password"
             name="confirmPassword"
             placeholder="Confirm Password"
-            value={formData.confirmPassword}
+            // value={formData.confirmPassword}
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
           />
-          {/* Security Question */}
           <select
             name="securityQuestion"
             value={formData.securityQuestion}
@@ -127,10 +114,9 @@ const SignUp = () => {
               What is your pet's name?
             </option>
             <option value="What is your date of birth?">
-              What is your date of birth?
+              Which country do you want to visit?
             </option>
           </select>
-          {/* Security Answer */}
           <input
             type="text"
             name="securityAnswer"
@@ -140,14 +126,13 @@ const SignUp = () => {
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
           />
         </div>
-        {/* Sign Up Button */}
         <button
           onClick={handleSignUp}
           className="w-full bg-blue-600 text-white py-2 mt-6 rounded-md hover:bg-blue-700 transition duration-300"
         >
           Sign Up
         </button>
-        {/* Already Have an Account */}
+
         <p className="text-center text-gray-600 mt-4">
           Already have an account?{" "}
           <span

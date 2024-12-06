@@ -39,16 +39,13 @@ const Navbar = () => {
       style={{ backgroundColor: "#0C356A" }}
       className="flex justify-between items-center p-4 text-white shadow-lg"
     >
-      {/* Logo Section */}
       <div className="flex items-center">
         <Logo />
         <span className="ml-4 text-lg font-semibold">My Application</span>
       </div>
 
-      {/* Current Date and Time */}
       <div className="text-sm">{currentDateTime}</div>
 
-      {/* Login Button */}
       <div>
         <button
           onClick={() => navigate("/login")}

@@ -1,24 +1,46 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const ChangePassword = () => {
-  const [formData, setFormData] = useState({
-    phone: "",
-    securityQuestion: "",
-    securityAnswer: "",
-  });
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const navigate = useNavigate();
 
-  const handleSubmit = () => {
-    if (!formData.phone || !formData.securityQuestion || !formData.securityAnswer) {
-      setError("All fields are required");
-      return;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Clear previous messages
+    setError("");
+    setSuccess("");
+
+    // Validation
+    if (password !== confirmPassword) {
+      return setError("Passwords do not match.");
     }
-    // Add your API call or logic here for verification
-    console.log("Submitted data:", formData);
+
+    try {
+      // API call to change password
+      const response = await axios.post("http://localhost:5000/change-password", {
+        phone,
+        password,
+      });
+
+      setSuccess(response.data.message || "Password changed successfully.");
+      setPhone("");
+      setPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      setError(
+        err.response && err.response.data && err.response.data.message
+          ? err.response.data.message
+          : "An error occurred. Please try again."
+      );
+    }
   };
 
   return (
@@ -27,48 +49,58 @@ const ChangePassword = () => {
         <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
           Change Password
         </h2>
+
         {error && (
           <p className="text-red-600 text-sm text-center mb-4">{error}</p>
         )}
-        <div className="space-y-4">
-          {/* Phone Number Input */}
-          <input
-            type="text"
-            name="phone"
-            placeholder="Phone Number"
-            value={formData.phone}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-          />
-          {/* Security Question Dropdown */}
-          <select
-            name="securityQuestion"
-            value={formData.securityQuestion}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+        {success && (
+          <p className="text-green-600 text-sm text-center mb-4">{success}</p>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-gray-600 mb-1">Phone Number</label>
+            <input
+              type="text"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Enter your phone number"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-600 mb-1">New Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter new password"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-gray-600 mb-1">Confirm Password</label>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm new password"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 mt-4 rounded-md hover:bg-blue-700 transition duration-300"
+            onClick={() => { navigate("/login") }}
           >
-            <option value="">Select a Security Question</option>
-            <option value="school">What is the name of your first school?</option>
-            <option value="pet">What is your pet's name?</option>
-            <option value="dob">What is your date of birth?</option>
-          </select>
-          {/* Security Answer Input */}
-          <input
-            type="text"
-            name="securityAnswer"
-            placeholder="Security Answer"
-            value={formData.securityAnswer}
-            onChange={handleChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-          />
-        </div>
-        {/* Submit Button */}
-        <button
-          onClick={handleSubmit}
-          className="w-full bg-blue-600 text-white py-2 mt-6 rounded-md hover:bg-blue-700 transition duration-300"
-        >
-          Verify
-        </button>
+            Change Password
+          </button>
+        </form>
       </div>
     </div>
   );
