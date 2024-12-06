@@ -216,18 +216,15 @@ app.use(bodyParser.json());
 
 // Connect to MongoDB
 mongoose
-  .connect("mongodb://127.0.0.1:27017/Task-Manager", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect("mongodb://127.0.0.1:27017/Task-Manager")
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Error connecting to MongoDB:", err));
 
-const taskSchema = new mongoose.Schema({
-  task_id: { type: String, default: () => uuidv4(), unique: true },
-  todo: { type: String, required: true },
-  isCompleted: { type: Boolean, default: false },
-});
+// const taskSchema = new mongoose.Schema({
+//   task_id: { type: String, default: () => uuidv4(), unique: true },
+//   todo: { type: String, required: true },
+//   isCompleted: { type: Boolean, default: false },
+// });
 
 // User Schema
 const userSchema = new mongoose.Schema({
@@ -236,30 +233,30 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, unique: true, required: true },
   password: { type: String, required: true },
   securityQuestion: { type: String, required: true },
-  securityAnswer: { type: String, required: true },
-  tasks: [taskSchema], 
+  securityAnswer: { type: String, required: true }
 });
 
-const User = mongoose.model("User", userSchema);
-module.exports = User;
+const Users = mongoose.model("User", userSchema);
+// module.exports = User;
 
 // User Signup
 app.post("/signup", async (req, res) => {
   try {
-    const { name, phone, password, securityQuestion, securityAnswer, tasks } = req.body;
-
-    const existingUser = await User.findOne({ phone });
+    const { name, phone, password, securityQuestion, securityAnswer } = req.body;
+    
+    const existingUser = await Users.findOne({ phone });
     if (existingUser) {
       return res.status(400).json({ message: "Phone number already exists" });
     }
-
-    const newUser = new User({
+    
+    const newUser = new Users({
       name,
       phone,
       password,
       securityQuestion,
       securityAnswer
     });
+    console.log(req.body);
     await newUser.save();
     res.status(201).json({ message: "User signed up successfully" });
   } catch (err) {
@@ -272,7 +269,7 @@ app.post("/login", async (req, res) => {
   try {
     const { phone, password } = req.body;
 
-    const user = await User.findOne({ phone });
+    const user = await Users.findOne({ phone });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
@@ -291,7 +288,7 @@ app.post("/login", async (req, res) => {
 // User Authentication
 app.post("/authenticate-user", async (req, res) => {
   try {
-    const { phone, securityQuestion, securityAnswer, newPassword } = req.body;
+    const { phone, securityQuestion, securityAnswer } = req.body;
 
     const user = await User.findOne({ phone });
     if (!user) {
@@ -314,10 +311,12 @@ app.post("/authenticate-user", async (req, res) => {
   }
 });
 
-// chnaging password
+// changing password
+
+// yahan dikkat
 app.post("/change-password", async (req, res) => {
   try {
-    const { phone, password, newPassword } = req.body;
+    const { phone, newPassword } = req.body;
 
     const user = await User.findOne({ phone });
     if (!user) {
@@ -325,7 +324,7 @@ app.post("/change-password", async (req, res) => {
     }
 
     user.password = newPassword;
-    await user.save();
+    await user.updateOne();
 
     res.status(200).json({ message: "Password changed successfully" });
 
@@ -349,7 +348,7 @@ app.get("/tasks/:user_id", async (req, res) => {
 
 
 // Add task
-app.post("/tasks/:user_id", async (req, res) => {
+app.post("/tasks", async (req, res) => {
   try {
     const { todo } = req.body;
     const user = await User.findById(req.params.user_id);
@@ -371,7 +370,7 @@ app.post("/tasks/:user_id", async (req, res) => {
 });
 
 // Update task
-app.put("/tasks/:user_id/:task_id", async (req, res) => {
+app.put("/tasks/:user_id", async (req, res) => {
   try {
     const { todo, isCompleted } = req.body;
     const user = await User.findById(req.params.user_id);
@@ -395,7 +394,7 @@ app.put("/tasks/:user_id/:task_id", async (req, res) => {
 });
 
 // Delete task
-app.delete("/tasks/:user_id/:task_id", async (req, res) => {
+app.delete("/tasks/:user_id", async (req, res) => {
   try {
     const user = await User.findById(req.params.user_id);
     if (!user) {

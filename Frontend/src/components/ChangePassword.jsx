@@ -25,7 +25,7 @@ const ChangePassword = () => {
 
     try {
       // API call to change password
-      const response = await axios.post("http://localhost:5000/change-password", {
+      const response = await axios.post(`http://localhost:5000/change-password/${user_id}`, {
         phone,
         password,
       });

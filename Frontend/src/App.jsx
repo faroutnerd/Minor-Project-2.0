@@ -15,7 +15,7 @@ function App() {
         <Route path="/task/:user_id" element={<TodoList />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/changepassword" element={<ChangePassword />} />
+        <Route path="/changepassword/user_id" element={<ChangePassword />} />
         <Route path="/authuser" element={<UserAuthentication />} />
       </Routes>
     </Router>

@@ -36,7 +36,7 @@ const SignUp = () => {
       return "Security answer must be at least 3 characters long.";
     }
 
-    return null;
+    return;
   };
 
   const handleSignUp = async () => {
@@ -45,10 +45,10 @@ const SignUp = () => {
       setError(error);
       return;
     }
-
+console.log(formData);
     try {
       await axios.post("http://localhost:5000/signup", formData);
-      // navigate("/login");
+      navigate("/login");
     } catch (err) {
       setError("Error signing up. Please try again.");
     }
@@ -96,7 +96,7 @@ const SignUp = () => {
             type="password"
             name="confirmPassword"
             placeholder="Confirm Password"
-            // value={formData.confirmPassword}
+            value={formData.confirmPassword}
             onChange={handleChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
           />
