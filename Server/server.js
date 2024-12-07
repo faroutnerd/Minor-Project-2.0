@@ -178,25 +178,30 @@ app.post("/tasks", async (req, res) => {
   }
 });
 
-// Update task
-app.put("/tasks/:user_id", async (req, res) => {
+// Edit task
+app.put("/tasks/:task_id", async (req, res) => {
   try {
-    const { todo, isCompleted } = req.body;
-    const user = await Users.findById(req.params.user_id);
+    const { task_id } = req.params
+    // const { todo, isCompleted } = req.body;
+    const newTask = {...req.body}
+    const user = await Tasks.find({task_id});
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const task = user.tasks.id(req.params.task_id);
-    if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    task.todo = todo;
-    task.isCompleted = isCompleted;
-    await user.save();
+    user = await Tasks.findOneAndUpdate({ task_id }, newTask, {new:true})
+    req.status(200).json({ message : "task updated", user })
 
-    res.json(task);
+    // const task = user.tasks.id(req.params.task_id);
+    // if (!task) {
+    //   return res.status(404).json({ message: "Task not found" });
+    // }
+
+    // task.todo = todo;
+    // task.isCompleted = isCompleted;
+    // await user.save();
+
+    // res.json(task);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
