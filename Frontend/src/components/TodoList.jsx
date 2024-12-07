@@ -11,35 +11,6 @@ const TodoList = () => {
 
   const { user_id } = useParams();
 
-  // Fetch tasks from the backend
-  // useEffect(() => {
-  //   const user_id = localStorage.getItem("user_id");
-  //   axios.get(`http://localhost:5000/tasks/?user_id=${user_id}`).then((response) => {
-  //     setTaskArray(response.data);
-  //   });
-  // }, []);
-
-  // useEffect(() => {
-  //   const fetchTasks = async () => {
-  //     const user_id = localStorage.getItem("user_id");
-  
-  //     if (!user_id) {
-  //       console.error("User ID not found in localStorage");
-  //       return;
-  //     }
-  
-  //     try {
-  //       const response = await axios.get(`http://localhost:5000/tasks/?user_id=${user_id}`);
-  //       setTaskArray(response.data); // Set the task array with data from the server
-  //     } catch (error) {
-  //       console.error("Error fetching tasks:", error.response?.data || error.message);
-  //     }
-  //   };
-  
-  //   fetchTasks();
-  // }, []);
-
-
   useEffect(() => {
     const fetchTasks = async () => {
       const user_id = localStorage.getItem("user_id");
@@ -48,20 +19,23 @@ const TodoList = () => {
         return;
       }
       try {
-        const response = await axios.get(`http://localhost:5000/tasks?user_id=${user_id}`);
+        const response = await axios.get(
+          `http://localhost:5000/tasks?user_id=${user_id}`
+        );
         setTaskArray(response.data); // Set the task array with data from the server
       } catch (error) {
-        console.error("Error fetching tasks:", error.response?.data || error.message);
+        console.error(
+          "Error fetching tasks:",
+          error.response?.data || error.message
+        );
       }
     };
     fetchTasks();
   }, []);
-  
 
   const toggleFinished = () => {
     setShowFinished(!showFinished);
   };
-
 
   // const handleEdit = (id) => {
   //   const updatedTask = { todo };
@@ -79,26 +53,27 @@ const TodoList = () => {
 
   const handleEdit = (id) => {
     const updatedTask = { todo };
-    axios.put(`http://localhost:5000/tasks/${id}`, updatedTask).then((response) => {
-      setTaskArray(
-        taskArray.map((task) => (task.task_id === id ? response.data : task))
-      );
-      setTodo("");
-    });
+    axios
+      .put(`http://localhost:5000/tasks/${id}`, updatedTask)
+      .then((response) => {
+        setTaskArray(
+          taskArray.map((task) => (task.task_id === id ? response.data : task))
+        );
+        setTodo("");
+      });
   };
-  
-  const handleDelete = (id) => {
-    axios.delete(`http://localhost:5000/tasks/${id}`).then(() => {
-      setTaskArray(taskArray.filter((task) => task.task_id !== id));
-    });
-  };
-  
 
   // const handleDelete = (e, id) => {
   //   axios.delete(`http://localhost:5000/tasks/${task_id}`).then(() => {
   //     setTaskArray(taskArray.filter((task) => task.task_id !== id));
   //   });
   // };
+
+  const handleDelete = (id) => {
+    axios.delete(`http://localhost:5000/tasks/${id}`).then(() => {
+      setTaskArray(taskArray.filter((task) => task.task_id !== id));
+    });
+  };
 
   // const handleAdd = () => {
   //   if (todo.trim() === "") return; // Prevent adding empty tasks
@@ -120,7 +95,6 @@ const TodoList = () => {
       setTodo("");
     });
   };
-  
 
   const handleChange = (e) => {
     setTodo(e.target.value);
@@ -142,32 +116,32 @@ const TodoList = () => {
 
   const handleCheckbox = (e) => {
     const id = e.target.name;
-  
+
     // Find the task and toggle its 'isCompleted' property
     const task = taskArray.find((task) => task.task_id === id);
     if (!task) {
       console.error("Task not found");
       return;
     }
-  
+
     const updatedTask = { ...task, isCompleted: !task.isCompleted };
-  
+
     // Send the updated task to the server
     axios
       .put(`http://localhost:5000/tasks/${id}`, updatedTask)
       .then((response) => {
         // Update the local state with the response
         setTaskArray((prevTasks) =>
-          prevTasks.map((task) =>
-            task.task_id === id ? response.data : task
-          )
+          prevTasks.map((task) => (task.task_id === id ? response.data : task))
         );
       })
       .catch((error) => {
-        console.error("Error updating task:", error.response?.data || error.message);
+        console.error(
+          "Error updating task:",
+          error.response?.data || error.message
+        );
       });
   };
-  
 
   return (
     <>
