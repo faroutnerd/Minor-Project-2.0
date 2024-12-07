@@ -13,7 +13,7 @@ const TodoList = () => {
 
   // Fetch tasks from the backend
   useEffect(() => {
-    axios.get(`http://localhost:5000/tasks/${user_id}`).then((response) => {
+    axios.get(`http://localhost:5000/tasks/?user_id=${user_id}`).then((response) => {
       setTaskArray(response.data);
     });
   }, []);
@@ -26,7 +26,7 @@ const TodoList = () => {
   const handleEdit = (id) => {
     const updatedTask = { todo };
     axios
-      .put(`http://localhost:5000/tasks/${user_id}/${task_id}`, updatedTask)
+      .put(`http://localhost:5000/tasks/${user_id}`, updatedTask)
       .then(() => {
         setTaskArray(
           taskArray.map((task) =>
