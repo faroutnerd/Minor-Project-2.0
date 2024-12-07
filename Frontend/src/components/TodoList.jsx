@@ -22,7 +22,7 @@ const TodoList = () => {
         const response = await axios.get(
           `http://localhost:5000/tasks?user_id=${user_id}`
         );
-        setTaskArray(response.data); // Set the task array with data from the server
+        setTaskArray(response.data);
       } catch (error) {
         console.error(
           "Error fetching tasks:",
@@ -37,54 +37,31 @@ const TodoList = () => {
     setShowFinished(!showFinished);
   };
 
-  // const handleEdit = (id) => {
-  //   const updatedTask = { todo };
-  //   axios
-  //     .put(`http://localhost:5000/tasks/${user_id}`, updatedTask)
-  //     .then(() => {
-  //       setTaskArray(
-  //         taskArray.map((task) =>
-  //           task.task_id === id ? { ...task, ...updatedTask } : task
-  //         )
-  //       );
-  //       setTodo("");
-  //     });
-  // };
-
   const handleEdit = (id) => {
+    if (todo.trim() === "") return; 
     const updatedTask = { todo };
+  
     axios
       .put(`http://localhost:5000/tasks/${id}`, updatedTask)
       .then((response) => {
         setTaskArray(
-          taskArray.map((task) => (task.task_id === id ? response.data : task))
+          taskArray.map((task) =>
+            task.task_id === id ? response.data : task
+          )
         );
         setTodo("");
-      });
+      })
+      .catch((error) => console.error("Error updating task:", error));
   };
-
-  // const handleDelete = (e, id) => {
-  //   axios.delete(`http://localhost:5000/tasks/${task_id}`).then(() => {
-  //     setTaskArray(taskArray.filter((task) => task.task_id !== id));
-  //   });
-  // };
 
   const handleDelete = (id) => {
-    axios.delete(`http://localhost:5000/tasks/${id}`).then(() => {
-      setTaskArray(taskArray.filter((task) => task.task_id !== id));
-    });
+    axios
+      .delete(`http://localhost:5000/tasks/${id}`) // Correctly pass task_id
+      .then(() => {
+        setTaskArray(taskArray.filter((task) => task.task_id !== id));
+      })
+      .catch((error) => console.error("Error deleting task:", error));
   };
-
-  // const handleAdd = () => {
-  //   if (todo.trim() === "") return; // Prevent adding empty tasks
-  //   const newTask = { todo, isCompleted: false };
-  //   axios
-  //     .post(`http://localhost:5000/tasks/${user_id}`, newTask)
-  //     .then((response) => {
-  //       setTaskArray([...taskArray, response.data]);
-  //       setTodo("");
-  //     });
-  // };
 
   const handleAdd = () => {
     if (todo.trim() === "") return; // Prevent adding empty tasks
@@ -100,24 +77,8 @@ const TodoList = () => {
     setTodo(e.target.value);
   };
 
-  // const handleCheckbox = (e) => {
-  //   const id = e.target.name;
-  //   const task = taskArray.find((task) => task.task_id === id);
-  //   const updatedTask = { ...task, isCompleted: !task.isCompleted };
-
-  //   axios
-  //     .put(`http://localhost:5000/tasks/${task_id}`, updatedTask)
-  //     .then((response) => {
-  //       setTaskArray(
-  //         taskArray.map((task) => (task.task_id === id ? response.data : task))
-  //       );
-  //     });
-  // };
-
   const handleCheckbox = (e) => {
     const id = e.target.name;
-
-    // Find the task and toggle its 'isCompleted' property
     const task = taskArray.find((task) => task.task_id === id);
     if (!task) {
       console.error("Task not found");
@@ -125,8 +86,6 @@ const TodoList = () => {
     }
 
     const updatedTask = { ...task, isCompleted: !task.isCompleted };
-
-    // Send the updated task to the server
     axios
       .put(`http://localhost:5000/tasks/${id}`, updatedTask)
       .then((response) => {
@@ -235,7 +194,7 @@ const TodoList = () => {
                       </td>
                       <td className="border border-gray-300 text-center">
                         <button
-                          onClick={(e) => handleEdit(e, task.task_id)}
+                          onClick={() => handleEdit(task.task_id)} // Removed 'e' and passed only task_id
                           disabled={task.isCompleted}
                           className={`${
                             task.isCompleted
@@ -252,7 +211,7 @@ const TodoList = () => {
                       </td>
                       <td className="border border-gray-300 text-center">
                         <button
-                          onClick={(e) => handleDelete(e, task.task_id)}
+                          onClick={() => handleDelete(task.task_id)} // Removed 'e' and passed only task_id
                           className={`hover:opacity-100 ${
                             task.isCompleted ? "opacity-50" : "opacity-100"
                           }`}
