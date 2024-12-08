@@ -1,234 +1,203 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "./Navbar";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 
 const TodoList = () => {
   const [todo, setTodo] = useState("");
+  const [editingTaskId, setEditingTaskId] = useState(null); // Track editing state
   const [taskArray, setTaskArray] = useState([]);
   const [showFinished, setShowFinished] = useState(true);
-
-  const { user_id } = useParams();
 
   useEffect(() => {
     const fetchTasks = async () => {
       const user_id = localStorage.getItem("user_id");
-      if (!user_id) {
-        console.error("User ID not found");
-        return;
-      }
       try {
         const response = await axios.get(
           `http://localhost:5000/tasks?user_id=${user_id}`
         );
         setTaskArray(response.data);
       } catch (error) {
-        console.error(
-          "Error fetching tasks:",
-          error.response?.data || error.message
-        );
+        console.error("Error fetching tasks:", error.message);
+        alert("Failed to fetch tasks. Please try again.");
       }
     };
     fetchTasks();
   }, []);
 
-  const toggleFinished = () => {
-    setShowFinished(!showFinished);
-  };
+  const handleAddOrEdit = () => {
+    if (todo.trim() === "") {
+      alert("Task cannot be empty.");
+      return;
+    }
 
-  const handleEdit = (id) => {
-    if (todo.trim() === "") return; 
-    const updatedTask = { todo };
-  
-    axios
-      .put(`http://localhost:5000/tasks/${id}`, updatedTask)
-      .then((response) => {
-        setTaskArray(
-          taskArray.map((task) =>
-            task.task_id === id ? response.data : task
-          )
-        );
-        setTodo("");
-      })
-      .catch((error) => console.error("Error updating task:", error));
+    const user_id = localStorage.getItem("user_id");
+
+    if (editingTaskId) {
+      // Editing task
+      const updatedTask = { todo };
+      axios
+        .put(`http://localhost:5000/tasks/${editingTaskId}`, updatedTask)
+        .then((response) => {
+          setTaskArray((prev) =>
+            prev.map((task) =>
+              task.task_id === editingTaskId ? response.data : task
+            )
+          );
+          setTodo("");
+          setEditingTaskId(null);
+          alert("Task updated successfully.");
+        })
+        .catch((error) => {
+          console.error("Error updating task:", error.message);
+          alert("Failed to update task. Please try again.");
+        });
+    } else {
+      // Adding new task
+      const newTask = { todo, user_id };
+      axios
+        .post("http://localhost:5000/tasks", newTask)
+        .then((response) => {
+          setTaskArray([...taskArray, response.data]);
+          setTodo("");
+          alert("Task added successfully.");
+        })
+        .catch((error) => {
+          console.error("Error adding task:", error.message);
+          alert("Failed to add task. Please try again.");
+        });
+    }
   };
 
   const handleDelete = (id) => {
-    axios
-      .delete(`http://localhost:5000/tasks/${id}`) // Correctly pass task_id
-      .then(() => {
-        setTaskArray(taskArray.filter((task) => task.task_id !== id));
-      })
-      .catch((error) => console.error("Error deleting task:", error));
-  };
-
-  const handleAdd = () => {
-    if (todo.trim() === "") return; // Prevent adding empty tasks
-    const user_id = localStorage.getItem("user_id");
-    const newTask = { todo, user_id };
-    axios.post("http://localhost:5000/tasks", newTask).then(() => {
-      setTaskArray([...taskArray, { ...newTask, isCompleted: false }]);
-      setTodo("");
-    });
-  };
-
-  const handleChange = (e) => {
-    setTodo(e.target.value);
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      axios
+        .delete(`http://localhost:5000/tasks/${id}`)
+        .then(() => {
+          setTaskArray((prev) => prev.filter((task) => task.task_id !== id));
+          alert("Task deleted successfully.");
+        })
+        .catch((error) => {
+          console.error("Error deleting task:", error.message);
+          alert("Failed to delete task. Please try again.");
+        });
+    }
   };
 
   const handleCheckbox = (e) => {
     const id = e.target.name;
     const task = taskArray.find((task) => task.task_id === id);
-    if (!task) {
-      console.error("Task not found");
-      return;
-    }
+    if (!task) return;
 
     const updatedTask = { ...task, isCompleted: !task.isCompleted };
     axios
       .put(`http://localhost:5000/tasks/${id}`, updatedTask)
       .then((response) => {
-        // Update the local state with the response
-        setTaskArray((prevTasks) =>
-          prevTasks.map((task) => (task.task_id === id ? response.data : task))
+        setTaskArray((prev) =>
+          prev.map((task) => (task.task_id === id ? response.data : task))
         );
+        alert("Task status updated.");
       })
       .catch((error) => {
-        console.error(
-          "Error updating task:",
-          error.response?.data || error.message
-        );
+        console.error("Error updating task:", error.message);
+        alert("Failed to update task. Please try again.");
       });
   };
 
   return (
     <>
       <Navbar />
+      <div className="container mx-auto px-4 py-6">
+        <h2 className="text-2xl font-bold mb-4">Task Manager</h2>
 
-      <div className="addTodo my-5 flex flex-col gap-4">
-        <h2 className="text-2xl font-bold">Add a Task</h2>
-        <div className="flex">
+        <div className="flex items-center gap-4 mb-6">
           <input
-            onChange={handleChange}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleAdd();
-              }
-            }}
             value={todo}
-            type="text"
+            onChange={(e) => setTodo(e.target.value)}
             placeholder="Enter your task"
-            className="w-[85%] rounded-full px-5 py-1 border border-black"
+            className="flex-1 px-4 py-2 border rounded-lg"
           />
           <button
-            onClick={handleAdd}
-            className="bg-violet-800 mx-2 rounded-full hover:bg-violet-950 disabled:bg-violet-500 p-4 py-2 text-xl font-bold text-white w-52"
+            onClick={handleAddOrEdit}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            Save
+            {editingTaskId ? "Update Task" : "Add Task"}
           </button>
         </div>
-      </div>
 
-      <input
-        className="my-4"
-        id="show"
-        onChange={toggleFinished}
-        type="checkbox"
-        checked={showFinished}
-      />
-      <label className="mx-2" htmlFor="show">
-        Show Finished
-      </label>
-      <div className="h-[1px] bg-black opacity-15 w-[90%] mx-auto my-2"></div>
-      <h2 className="text-2xl font-bold">Your Todos</h2>
-      <div className="taskArray">
+        <label className="flex items-center mb-4">
+          <input
+            type="checkbox"
+            checked={showFinished}
+            onChange={() => setShowFinished((prev) => !prev)}
+            className="mr-2"
+          />
+          Show Finished Tasks
+        </label>
+
         {taskArray.length === 0 ||
         (!showFinished && taskArray.every((task) => task.isCompleted)) ? (
-          <div className="text-center mt-4">No Tasks to show</div>
+          <p className="text-gray-500">No tasks to display.</p>
         ) : (
-          <div className="flex justify-center px-4">
-            <table className="table-auto border-collapse border border-gray-300 w-full lg:w-2/3 mt-4">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="border border-gray-300 py-2 px-4 text-center">
-                    isComplete?
-                  </th>
-                  <th className="border border-gray-300 py-2 px-4 text-left w-1/2">
-                    Task
-                  </th>
-                  <th className="border border-gray-300 py-2 px-4 text-center">
-                    Edit Task
-                  </th>
-                  <th className="border border-gray-300 py-2 px-4 text-center">
-                    Delete Task
-                  </th>
-                </tr>
-              </thead>
+          <table className="table-auto w-full border-collapse border border-gray-300 py-2">
+            <thead className="border border-gray-300">
+              <tr className="bg-gray-100">
+                <th className="border border-gray-300 border-t-1 px-4">Complete</th>
+                <th className="border border-gray-300 border-t-1 px-4">Task</th>
+                <th className="border border-gray-300 border-t-1 px-4">Action</th>
+              </tr>
+            </thead>
+            <tbody  className="border border-gray-300">
+              {taskArray.map((task) =>
+                !showFinished && task.isCompleted ? null : (
+                  <tr
+                    key={task.task_id}
+                    className={
+                      task.isCompleted ? "opacity-60" : ""
+                    }
+                  >
+                    <td className="border border-gray-300 border-t-1 px-4 text-center">
+                      <input
+                        type="checkbox"
+                        name={task.task_id}
+                        checked={task.isCompleted}
+                        onChange={handleCheckbox}
 
-              <tbody>
-                {taskArray.map((task) => {
-                  if (!showFinished && task.isCompleted) {
-                    return null;
-                  }
-                  return (
-                    <tr
-                      key={task.task_id}
-                      className={`hover:bg-gray-50 ${
-                        task.isCompleted ? "opacity-50" : ""
-                      }`}
-                    >
-                      <td className="border border-gray-300 text-center">
-                        <label className="flex items-center justify-center">
-                          <input
-                            name={task.task_id}
-                            onChange={handleCheckbox}
-                            type="checkbox"
-                            checked={task.isCompleted}
-                            className="w-5 h-5 accent-blue-500 rounded-lg border-gray-400 shadow-sm focus:ring focus:ring-blue-300"
-                          />
-                        </label>
-                      </td>
-                      <td className="border border-gray-300 text-left py-2 px-4">
-                        {task.todo}
-                      </td>
-                      <td className="border border-gray-300 text-center">
-                        <button
-                          onClick={() => handleEdit(task.task_id)} // Removed 'e' and passed only task_id
-                          disabled={task.isCompleted}
-                          className={`${
-                            task.isCompleted
-                              ? "opacity-50 cursor-not-allowed"
-                              : "hover:opacity-80"
-                          }`}
-                        >
-                          <img
-                            src={"../src/assets/edit.png"}
-                            alt="Edit"
-                            className="w-8 h-auto rounded"
-                          />
-                        </button>
-                      </td>
-                      <td className="border border-gray-300 text-center">
-                        <button
-                          onClick={() => handleDelete(task.task_id)} // Removed 'e' and passed only task_id
-                          className={`hover:opacity-100 ${
-                            task.isCompleted ? "opacity-50" : "opacity-100"
-                          }`}
-                        >
-                          <img
-                            src={"../src/assets/trash.png"}
-                            alt="Delete"
-                            className="w-8 h-auto rounded"
-                          />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                      />
+                    </td>
+                    <td className="border border-gray-300 border-t-1 px-4 w-2/3">{task.todo}</td>
+
+                    <td className="border border-gray-300 border-t-1 px-4 flex gap-3 justify-center">
+                      <button
+                        onClick={() => {
+                          setTodo(task.todo);
+                          setEditingTaskId(task.task_id);
+                        }}
+                        className={
+                          task.isCompleted ? "cursor-not-allowed" : ""
+                        }
+                      >
+                        <img
+                          src={"../src/assets/edit.png"}
+                          alt="Edit"
+                          className="w-8 h-auto rounded"
+                        />
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(task.task_id)}
+                      >
+                        <img
+                          src={"../src/assets/trash.png"}
+                          alt="Delete"
+                          className="w-8 h-auto rounded"
+                        />
+                      </button>
+                    </td>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
         )}
       </div>
     </>

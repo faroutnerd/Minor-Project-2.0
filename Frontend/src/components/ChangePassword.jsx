@@ -11,24 +11,19 @@ const ChangePassword = () => {
 
   const navigate = useNavigate();
 
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Clear previous messages
-    setError("");
-    setSuccess("");
 
-    // Validation
     if (password !== confirmPassword) {
       return setError("Passwords do not match.");
     }
 
     try {
-      // API call to change password
-      const response = await axios.post(`http://localhost:5000/change-password/${user_id}`, {
-        phone,
-        password,
-      });
+      const user_id = localStorage.getItem("user_id", user_id)
+      const response = await axios.put(`http://localhost:5000/change-password/${user_id}`, password);
 
       setSuccess(response.data.message || "Password changed successfully.");
       setPhone("");

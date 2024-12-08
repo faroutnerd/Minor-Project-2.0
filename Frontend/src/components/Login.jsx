@@ -8,22 +8,6 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // const handleLogin = async () => {
-  //   try {
-  //     const response = await axios.post("http://localhost:5000/login", {
-  //       phone:phone,
-  //       password:password
-  //     });
-
-  //     // Extract user_id from the response and save it in local storage
-  //     const user_id = response.data.userId;
-  //     localStorage.setItem("user_id", user_id);
-  //     navigate(`/tasks/?user_id=${user_id}`);
-  //   } catch (err) {
-  //     setError(err.response?.data?.message || "Invalid credentials");
-  //   }
-  // };
-
   const handleLogin = async () => {
     try {
       const response = await axios.post("http://localhost:5000/login", {

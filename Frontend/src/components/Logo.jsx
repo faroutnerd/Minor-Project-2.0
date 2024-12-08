@@ -7,8 +7,8 @@ const Logo = () => {
         <a href="/">
           <div className="logo font-bold text-2xl">
             <span style={{ color: "#40F8FF" }}>&lt;</span>
-            Todo
-            <span style={{ color: "#40F8FF" }}>List/&gt;</span>
+            Task
+            <span style={{ color: "#40F8FF" }}>Manager/&gt;</span>
           </div>
         </a>
       </h1>

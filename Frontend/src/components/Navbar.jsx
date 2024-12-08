@@ -34,6 +34,12 @@ const Navbar = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  const handleLogout = () => {
+    navigate("/login");
+    localStorage.removeItem("user_id", user_id);
+
+  }
+
   return (
     <nav
       style={{ backgroundColor: "#0C356A" }}
@@ -41,17 +47,17 @@ const Navbar = () => {
     >
       <div className="flex items-center">
         <Logo />
-        <span className="ml-4 text-lg font-semibold">My Application</span>
+        
       </div>
 
       <div className="text-sm">{currentDateTime}</div>
 
       <div>
         <button
-          onClick={() => navigate("/login")}
+          onClick={handleLogout}
           className="px-6 py-2 text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300 rounded-md shadow-lg transition duration-300"
         >
-          Login
+          Logout
         </button>
       </div>
     </nav>

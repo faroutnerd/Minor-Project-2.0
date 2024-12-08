@@ -83,32 +83,28 @@ app.post("/login", async (req, res) => {
   }
 });
 
-
-// User Authentication
 app.post("/authenticate-user", async (req, res) => {
   try {
     const { phone, securityQuestion, securityAnswer } = req.body;
 
     const user = await Users.findOne({ phone });
     if (!user) {
-      return res.status(400).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     if (
       user.securityQuestion !== securityQuestion ||
-      user.securityAnswer !== securityAnswer
+      user.securityAnswer.toLowerCase() !== securityAnswer.toLowerCase()
     ) {
-      return res.status(400).json({ message: "Security question or answer is incorrect" });
+      return res.status(400).json({ message: "Incorrect security question or answer." });
     }
 
-    // user.password = newPassword;
-    // await user.save();
-
-    res.status(200).json({ message: "You can change your password" });
+    res.status(200).json({ message: "Authentication successful", user_id: user.user_id });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Server error, please try again later" });
   }
 });
+
 
 // changing password
 
@@ -132,24 +128,6 @@ app.post("/change-password", async (req, res) => {
   }
 });
 
-// Getting all the tasks
-// app.get("/tasks/", async (req, res) => {
-//   try {
-//     const user = await Tasks.find(req.query);
-//     // if (!user) {
-//     //   res.json(user);
-//     //   // return res.status(404).json({ message: "User not found" });
-//     // }
-//     res.json({user});
-//     console.log("Hello");
-//     // res.json(user.tasks);
-    
-//   } catch (err) {
-//     res.status(500).json({ message: err.message });
-//   }
-// });
-
-
 app.get("/tasks", async (req, res) => {
   try {
     const tasks = await Tasks.find(req.query);
@@ -164,65 +142,34 @@ app.get("/tasks", async (req, res) => {
 app.post("/tasks", async (req, res) => {
   try {
     const { todo, user_id } = req.body;
-    // const user = await Tasks.find(req.body);
-    // if (!user) {
-    //   return res.status(404).json({ message: "User not found" });
-    // }
-
-    // const newTask = { todo, isCompleted: false }; // Create a plain task object
-    // user.tasks.push(newTask); // Add the task to the user's task list
-
-    // const newTask = new Task({ todo });
-    // user.tasks.push(newTask);
     const newUser = new Tasks ({
       todo,
       user_id
     });
     
     await newUser.save();
-
-    // res.json(newTask);
     res.json({message: "Task created successfully."});
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// // Edit task
-// app.put("/tasks/:task_id", async (req, res) => {
-//   try {
-//     const { task_id } = req.params
-//     // const { todo, isCompleted } = req.body;
-//     const newTask = {...req.body}
-//     const user = await Tasks.find({task_id});
-//     if (!user) {
-//       return res.status(404).json({ message: "Task not found" });
-//     }
-
-//     user = await Tasks.findOneAndUpdate({ task_id }, newTask, {new:true})
-//     req.status(200).json({ message : "task updated", user })
-
-//     // const task = user.tasks.id(req.params.task_id);
-//     // if (!task) {
-//     //   return res.status(404).json({ message: "Task not found" });
-//     // }
-
-//     // task.todo = todo;
-//     // task.isCompleted = isCompleted;
-//     // await user.save();
-
-//     // res.json(task);
-//   } catch (err) {
-//     res.status(500).json({ message: err.message });
-//   }
-// });
-
+ // edit task
 app.put("/tasks/:task_id", async (req, res) => {
   try {
     const { task_id } = req.params;
-    const updatedTask = { ...req.body };
-    const task = await Tasks.findOneAndUpdate({ task_id }, updatedTask, { new: true });
-    if (!task) return res.status(404).json({ message: "Task not found" });
+    const updatedTask = req.body;
+
+    const task = await Tasks.findOneAndUpdate(
+      { task_id },
+      updatedTask,
+      { new: true }
+    );
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
     res.status(200).json(task);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -230,39 +177,7 @@ app.put("/tasks/:task_id", async (req, res) => {
 });
 
 
-// // Delete task
-// app.delete("/tasks/:task_id", async (req, res) => {
-//   try {
-//     const user = await Users.findById(req.params.user_id);
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     const task = user.tasks.id(req.params.task_id);
-//     if (!task) {
-//       return res.status(404).json({ message: "Task not found" });
-//     }
-
-//     task.remove();
-//     await user.save();
-
-//     res.sendStatus(204);
-//   } catch (err) {
-//     res.status(500).json({ message: err.message });
-//   }
-// });
-
-// app.delete("/tasks/:task_id", async (req, res) => {
-//   try {
-//     const { task_id } = req.params;
-//     const task = await Tasks.findOneAndDelete({ task_id });
-//     if (!task) return res.status(404).json({ message: "Task not found" });
-//     res.status(204).send();
-//   } catch (err) {
-//     res.status(500).json({ message: err.message });
-//   }
-// });
-
+// delete task
 app.delete("/tasks/:task_id", async (req, res) => {
   try {
     const { task_id } = req.params;

@@ -6,28 +6,43 @@ const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white">
-      <div className="mb-6">
-       <Logo />
+    <div className="min-h-screen flex flex-col items-center justify-between p-8">
+      <div className="w-full flex items-center justify-between max-w-4xl mx-auto">
+        <Logo />
+        <nav className="space-x-4">
+          <button
+            onClick={() => navigate("/login")}
+            className="bg-white text-indigo-600 py-2 px-6 rounded-full font-semibold shadow-md hover:bg-gray-100 transition duration-300"
+          >
+            Login
+          </button>
+          <button
+            onClick={() => navigate("/signup")}
+            className="bg-indigo-700 text-white py-2 px-6 rounded-full font-semibold shadow-md hover:bg-indigo-800 transition duration-300"
+          >
+            Sign Up
+          </button>
+        </nav>
       </div>
 
-      <p className="text-center text-lg max-w-md mb-8">
-        Simplify your life with our app. Manage your tasks, stay organized, and
-        never miss a deadline. Taskly is here to help you achieve your goals.
-      </p>
-      <div className="space-y-4 px-4 mx-4">
+      <div className="flex flex-col items-center text-center max-w-2xl mt-16">
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          Organize Your Life, Effortlessly
+        </h1>
+        <p className="text-lg md:text-xl mb-8">
+          Manage your tasks, stay organized, and achieve your goals with Taskly.
+          Your productivity companion.
+        </p>
         <button
           onClick={() => navigate("/signup")}
-          className="w-48 bg-white text-blue-600 py-3 rounded-lg font-medium shadow-md hover:bg-gray-100 transition duration-300"
+          className="bg-white text-indigo-600 py-3 px-8 rounded-full font-medium shadow-lg hover:bg-gray-100 transition duration-300"
         >
-          Sign Up
+          Get Started
         </button>
-        <button
-          onClick={() => navigate("/login")}
-          className="w-48 bg-blue-700 border border-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-800 transition duration-300"
-        >
-          Login
-        </button>
+      </div>
+
+      <div className="text-sm text-gray-200 mt-16">
+        &copy; {new Date().getFullYear()} Taskly. All rights reserved.
       </div>
     </div>
   );
