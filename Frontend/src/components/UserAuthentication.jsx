@@ -16,45 +16,6 @@ const UserAuthentication = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-
-  // const handleSubmit = async () => {
-  //   // Clear any previous errors
-  //   setError("");
-  
-  //   // Validate inputs
-  //   if (!formData.phone || !formData.securityQuestion || !formData.securityAnswer) {
-  //     setError("All fields are required.");
-  //     return;
-  //   }
-  
-  //   try {
-  //     // Show a loading indicator if needed
-  //     // Set up payload for API
-  //     const payload = {
-  //       phone: formData.phone,
-  //       securityQuestion: formData.securityQuestion,
-  //       securityAnswer: formData.securityAnswer,
-  //     };
-  
-  //     // Call the API
-  //     const response = await axios.post("http://localhost:5000/authenticate-user", payload);
-  
-  //     // Handle successful response
-  //     const user_id = response.data.user_id;
-  //     if (user_id) {
-  //       localStorage.setItem("user_id", user_id);
-  //       alert("Authentication successful. You can change your password.");
-  //       navigate("/changepassword");
-  //     } else {
-  //       throw new Error("Invalid response from server.");
-  //     }
-  //   } catch (error) {
-  //     // Handle errors
-  //     setError(error.response?.data?.message || "An error occurred. Please try again.");
-  //   }
-  // };
-  
-
   const handleSubmit = async () => {
   
     if (!formData.phone || !formData.securityQuestion || !formData.securityAnswer) {
@@ -63,7 +24,8 @@ const UserAuthentication = () => {
     }
   
     try {
-      const response = await axios.post("http://localhost:5000/authenticate-user", {phone, securityQuestion, securityAnswer});
+      const response = await axios.post("http://localhost:5000/authuser", {phone, securityQuestion, securityAnswer});
+      console.log(response)
       localStorage.setItem("user_id", response.data.user_id);
       alert("Authentication successful. You can change your password.");
       navigate("/changepassword");

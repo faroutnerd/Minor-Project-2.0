@@ -21,15 +21,18 @@ const Login = () => {
       setError(err.response?.data?.message || "Invalid credentials");
     }
   };
-  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Login</h2>
-        
+      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
+        <h2 className="text-3xl font-extrabold text-center mb-6 text-gray-800">
+          Welcome Back
+        </h2>
+
         {error && (
-          <p className="text-red-600 text-sm text-center mb-4">{error}</p>
+          <div className="bg-red-100 text-red-600 p-3 rounded mb-4 text-sm text-center">
+            {error}
+          </div>
         )}
 
         <div className="space-y-4">
@@ -38,21 +41,21 @@ const Login = () => {
             placeholder="Phone Number"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-          
+
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
 
         <button
           onClick={handleLogin}
-          className="w-full bg-blue-600 text-white py-2 mt-6 rounded-md hover:bg-blue-700 transition duration-300"
+          className="w-full bg-blue-600 text-white py-2 mt-6 rounded-lg font-semibold hover:bg-blue-700 transition duration-300"
         >
           Login
         </button>
@@ -64,19 +67,19 @@ const Login = () => {
           Forgot Password?
         </button>
 
-        <div className="flex items-center justify-center my-4">
-          <span className="border-t w-1/3 border-gray-300"></span>
-          <span className="text-sm text-gray-500 mx-2">or</span>
-          <span className="border-t w-1/3 border-gray-300"></span>
+        <div className="flex items-center justify-center my-6">
+          <span className="border-t w-1/4 border-gray-300"></span>
+          <span className="text-gray-500 mx-2">or</span>
+          <span className="border-t w-1/4 border-gray-300"></span>
         </div>
 
         <div className="text-center">
-          <p className="text-gray-600 text-sm mb-2">
-            Don't have an account?{" "}
+          <p className="text-gray-600 text-sm mb-4">
+            Don’t have an account?{" "}
           </p>
           <button
             onClick={() => navigate("/signup")}
-            className="w-full bg-gray-200 text-gray-700 py-2 rounded-md hover:bg-gray-300 transition duration-300"
+            className="w-full bg-gray-200 text-gray-700 py-2 rounded-lg font-medium hover:bg-gray-300 transition duration-300"
           >
             Sign Up
           </button>

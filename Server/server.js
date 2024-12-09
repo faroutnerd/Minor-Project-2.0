@@ -83,7 +83,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.post("/authenticate-user", async (req, res) => {
+app.post("/authuser", async (req, res) => {
   try {
     const { phone, securityQuestion, securityAnswer } = req.body;
 

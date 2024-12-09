@@ -33,16 +33,10 @@ const Home = () => {
           Manage your tasks, stay organized, and achieve your goals with Taskly.
           Your productivity companion.
         </p>
-        <button
-          onClick={() => navigate("/signup")}
-          className="bg-white text-indigo-600 py-3 px-8 rounded-full font-medium shadow-lg hover:bg-gray-100 transition duration-300"
-        >
-          Get Started
-        </button>
       </div>
 
-      <div className="text-sm text-gray-200 mt-16">
-        &copy; {new Date().getFullYear()} Taskly. All rights reserved.
+      <div className="text-sm mt-16">
+        &copy; 2024 TaskManager. All rights reserved.
       </div>
     </div>
   );

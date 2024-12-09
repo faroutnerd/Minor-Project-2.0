@@ -24,6 +24,8 @@ const Navbar = () => {
         "December",
       ];
       const day = now.getDate();
+      // console.log(now.getMonth());
+      console.log(now.toLocaleTimeString())
       const month = months[now.getMonth()];
       const year = now.getFullYear();
       const time = now.toLocaleTimeString();
