@@ -91,10 +91,12 @@ app.post("/authuser", async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    console.log(user.securityQuestion);
+    console.log(user.securityAnswer);
 
     if (
-      user.securityQuestion !== securityQuestion ||
-      user.securityAnswer.toLowerCase() !== securityAnswer.toLowerCase()
+      user.securityQuestion != securityQuestion ||
+      user.securityAnswer.toLowerCase() != securityAnswer.toLowerCase()
     ) {
       return res.status(400).json({ message: "Incorrect security question or answer." });
     }

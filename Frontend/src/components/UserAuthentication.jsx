@@ -9,31 +9,56 @@ const UserAuthentication = () => {
     securityQuestion: "",
     securityAnswer: "",
   });
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
+//   const handleSubmit = async () => {
   
-    if (!formData.phone || !formData.securityQuestion || !formData.securityAnswer) {
-      setError("All fields are required.");
-      return;
-    }
+//     if (!formData.phone || !formData.securityQuestion || !formData.securityAnswer) {
+//       setError("All fields are required.");
+//       return;
+//     }
   
-    try {
-      const response = await axios.post("http://localhost:5000/authuser", {phone, securityQuestion, securityAnswer});
-      console.log(response)
-      localStorage.setItem("user_id", response.data.user_id);
-      alert("Authentication successful. You can change your password.");
-      navigate("/changepassword");
-    } catch (error) {
-      setError(error.response?.data?.message || "An error occurred. Please try again.");
-    }
-  };
+//     try {
+//       const response = await axios.post("http://localhost:5000/authuser", {
+//         phone, 
+//         securityQuestion, 
+//         securityAnswer
+//       });
+//       localStorage.setItem("user_id", response.data.userId);
+//       alert("Authentication successful. You can change your password.");
+//       navigate("/changepassword");
+//     } catch (error) {
+//       setError(error.response?.data?.message || "An error occurred. Please try again.");
+//     }
+//   };
   
+
+const handleSubmit = async () => {
+  if (!formData.phone || !formData.securityQuestion || !formData.securityAnswer) {
+    setError("All fields are required.");
+    return;
+  }
+
+  try {
+    const { phone, securityQuestion, securityAnswer } = formData;
+    const response = await axios.post("http://localhost:5000/authuser", {
+      phone,
+      securityQuestion,
+      securityAnswer,
+    });
+    localStorage.setItem("user_id", response.data.user_id);
+    alert("Authentication successful. You can change your password.");
+    navigate("/changepassword");
+  } catch (error) {
+    setError(error.response?.data?.message || "An error occurred. Please try again.");
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -60,11 +85,9 @@ const UserAuthentication = () => {
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
           >
             <option value="">Select a Security Question</option>
-            <option value="school">
-              What is the name of your first school?
-            </option>
-            <option value="pet">What is your pet's name?</option>
-            <option value="dob">What is your date of birth?</option>
+            <option value={formData.securityQuestion}>What is the name of your first school?</option>
+            <option value={formData.securityQuestion}>What is your pet's name?</option>
+            <option value={formData.securityQuestion}>What is your date of birth?</option>
           </select>
           <input
             type="text"

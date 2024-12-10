@@ -15,7 +15,9 @@ const Login = () => {
         password,
       });
       const user_id = response.data.userId;
+      const user_name = response.data.name;
       localStorage.setItem("user_id", user_id);
+      localStorage.setItem("userName", user_name);
       navigate(`/task`);
     } catch (err) {
       setError(err.response?.data?.message || "Invalid credentials");
@@ -61,7 +63,7 @@ const Login = () => {
         </button>
 
         <button
-          onClick={() => navigate("/changepassword")}
+          onClick={() => navigate("/authuser")}
           className="w-full text-blue-600 mt-4 text-sm hover:underline"
         >
           Forgot Password?

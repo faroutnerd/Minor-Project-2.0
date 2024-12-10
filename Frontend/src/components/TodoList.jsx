@@ -11,6 +11,11 @@ const TodoList = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       const user_id = localStorage.getItem("user_id");
+      if (!user_id) {
+        alert("You must be logged in to perform this action.");
+        navigate("/login");
+        return;
+      }
       try {
         const response = await axios.get(
           `http://localhost:5000/tasks?user_id=${user_id}`
