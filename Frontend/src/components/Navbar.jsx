@@ -79,8 +79,8 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch the user's name from localStorage
-    const storedUserName = localStorage.getItem("user_name");
+    const storedUserName = localStorage.getItem("userName");
+    console.log(storedUserName)
     if (storedUserName) {
       setUserName(storedUserName);
     }
@@ -114,14 +114,13 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("user_id");
-    localStorage.removeItem("user_name"); // Optional, if you also want to clear the user's name
+    localStorage.removeItem("user_name");
     navigate("/login");
   };
 
   return (
     <nav
-      style={{ backgroundColor: "#0C356A" }}
-      className="flex justify-between items-center p-4 text-white shadow-lg"
+      className="flex justify-between items-center p-4 shadow-md"
     >
       <div className="flex items-center">
         <Logo />

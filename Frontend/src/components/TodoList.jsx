@@ -27,7 +27,7 @@ const TodoList = () => {
       }
     };
     fetchTasks();
-  }, []);
+  });
 
   const handleAddOrEdit = () => {
     if (todo.trim() === "") {
@@ -171,7 +171,7 @@ const TodoList = () => {
                     </td>
                     <td className="border border-gray-300 border-t-1 px-4 w-2/3">{task.todo}</td>
 
-                    <td className="border border-gray-300 border-t-1 px-4 flex gap-3 justify-center">
+                    <td className="border border-gray-300 border-t-1 px-4 text-center">
                       <button
                         onClick={() => {
                           setTodo(task.todo);

@@ -15,9 +15,10 @@ const Login = () => {
         password,
       });
       const user_id = response.data.userId;
-      const user_name = response.data.name;
+      const userName = response.data.UserName;
       localStorage.setItem("user_id", user_id);
-      localStorage.setItem("userName", user_name);
+      localStorage.setItem("userName", userName);
+      console.log(userName)
       navigate(`/task`);
     } catch (err) {
       setError(err.response?.data?.message || "Invalid credentials");
