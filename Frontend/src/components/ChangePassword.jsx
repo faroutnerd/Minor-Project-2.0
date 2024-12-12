@@ -11,33 +11,6 @@ const ChangePassword = () => {
 
   const navigate = useNavigate();
 
-  
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-
-  //   if (password !== confirmPassword) {
-  //     return setError("Passwords do not match.");
-  //   }
-
-  //   try {
-  //     const user_id = localStorage.getItem("user_id", user_id)
-  //     const response = await axios.put(`http://localhost:5000/change-password/${user_id}`, password);
-
-  //     setSuccess(response.data.message || "Password changed successfully.");
-  //     setPhone("");
-  //     setPassword("");
-  //     setConfirmPassword("");
-  //   } catch (err) {
-  //     setError(
-  //       err.response && err.response.data && err.response.data.message
-  //         ? err.response.data.message
-  //         : "An error occurred. Please try again."
-  //     );
-  //   }
-  // };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -46,7 +19,7 @@ const ChangePassword = () => {
     }
   
     try {
-      const response = await axios.post("http://localhost:5000/change-password", {
+      const response = await axios.put("http://localhost:5000/change-password", {
         phone,
         newPassword: password,
       });

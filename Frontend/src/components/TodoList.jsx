@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "./Navbar";
+import { useNavigate } from "react-router-dom";
 
 const TodoList = () => {
   const [todo, setTodo] = useState("");
   const [editingTaskId, setEditingTaskId] = useState(null); // Track editing state
   const [taskArray, setTaskArray] = useState([]);
   const [showFinished, setShowFinished] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTasks = async () => {

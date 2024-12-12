@@ -83,52 +83,104 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// User Authentication Endpoint
 app.post("/authuser", async (req, res) => {
   try {
     const { phone, securityQuestion, securityAnswer } = req.body;
 
+    // Find user by phone number
     const user = await Users.findOne({ phone });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    console.log(user.securityQuestion);
-    console.log(user.securityAnswer);
 
+    // Validate security question and answer
     if (
-      user.securityQuestion != securityQuestion ||
-      user.securityAnswer.toLowerCase() != securityAnswer.toLowerCase()
+      user.securityQuestion !== securityQuestion ||
+      user.securityAnswer.toLowerCase() !== securityAnswer.toLowerCase()
     ) {
-      return res.status(400).json({ message: "Incorrect security question or answer." });
+      return res
+        .status(400)
+        .json({ message: "Incorrect security question or answer." });
     }
 
-    res.status(200).json({ message: "Authentication successful", user_id: user.user_id });
+    res.status(200).json({
+      message: "Authentication successful",
+      user_id: user.user_id,
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error, please try again later" });
   }
 });
 
+// // changing password
 
-// changing password
+// // yahan dikkat
+// app.post("/change-password", async (req, res) => {
+//   try {
+//     const { phone, newPassword } = req.body;
 
-// yahan dikkat
-app.post("/change-password", async (req, res) => {
+//     const user = await Users.findOne({ phone });
+//     if (!user) {
+//       return res.status(400).json({ message: "User not found" });
+//     }
+
+//     user.password = newPassword;
+//     await user.updateOne();
+
+//     res.status(200).json({ message: "Password changed successfully" });
+
+//   } catch (err) {
+//     res.status(500).json({ message: "Server error, please try again later" });
+//   }
+// });
+
+// Change Password Endpoint
+// app.post("/change-password", async (req, res) => {
+//   try {
+//     const { phone, newPassword } = req.body;
+
+//     // Find user by phone number
+//     const user = await Users.findOne({ phone });
+//     if (!user) {
+//       return res.status(400).json({ message: "User not found" });
+//     }
+
+//     // Update the user's password
+//     user.password = newPassword;
+//     await user.save();
+
+//     res.status(200).json({ message: "Password changed successfully" });
+//   } catch (err) {
+//     res.status(500).json({ message: "Server error, please try again later" });
+//   }
+// });
+
+app.put("/change-password", async (req, res) => {
   try {
     const { phone, newPassword } = req.body;
 
-    const user = await Users.findOne({ phone });
-    if (!user) {
-      return res.status(400).json({ message: "User not found" });
+    // Validate input
+    if (!phone || !newPassword) {
+      return res.status(400).json({ message: "Phone number and new password are required." });
     }
 
+    // Find user by phone number
+    const user = await Users.findOne({ phone });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update the user's password
     user.password = newPassword;
-    await user.updateOne();
+    await user.save();
 
     res.status(200).json({ message: "Password changed successfully" });
-
   } catch (err) {
-    res.status(500).json({ message: "Server error, please try again later" });
+    res.status(500).json({ message: "Server error, please try again later." });
   }
 });
+
 
 app.get("/tasks", async (req, res) => {
   try {
