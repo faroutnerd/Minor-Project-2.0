@@ -15,7 +15,9 @@ const Login = () => {
         password,
       });
       const user_id = response.data.userId;
-      const userName = response.data.UserName;
+      const userName = response.data.userName;
+      // console.log(response.data.userName);
+      console.log(userName)
       localStorage.setItem("user_id", user_id);
       localStorage.setItem("userName", userName);
       console.log(userName)
