@@ -170,6 +170,7 @@ const TodoList = () => {
                         onChange={handleCheckbox}
 
                       />
+                      
                     </td>
                     <td className="border border-gray-300 border-t-1 px-4 w-2/3">{task.todo}</td>
 

@@ -16,11 +16,8 @@ const Login = () => {
       });
       const user_id = response.data.userId;
       const userName = response.data.userName;
-      // console.log(response.data.userName);
-      console.log(userName)
       localStorage.setItem("user_id", user_id);
       localStorage.setItem("userName", userName);
-      console.log(userName)
       navigate(`/task`);
     } catch (err) {
       setError(err.response?.data?.message || "Invalid credentials");
@@ -80,7 +77,7 @@ const Login = () => {
 
         <div className="text-center">
           <p className="text-gray-600 text-sm mb-4">
-            Don’t have an account?{" "}
+            Don’t have an account?
           </p>
           <button
             onClick={() => navigate("/signup")}

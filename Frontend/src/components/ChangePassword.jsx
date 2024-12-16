@@ -8,7 +8,6 @@ const ChangePassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -36,8 +35,6 @@ const ChangePassword = () => {
     }
 
     try {
-      setLoading(true);
-
       const response = await axios.post("http://localhost:5000/change-password", {
         phone,
         newPassword: password,
@@ -54,8 +51,6 @@ const ChangePassword = () => {
       setError(
         err.response?.data?.message || "An error occurred. Please try again."
       );
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -112,9 +107,7 @@ const ChangePassword = () => {
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 mt-4 rounded-md hover:bg-blue-700 transition duration-300 disabled:opacity-50"
-            disabled={loading}
           >
-            {loading ? "Processing..." : "Change Password"}
           </button>
         </form>
       </div>

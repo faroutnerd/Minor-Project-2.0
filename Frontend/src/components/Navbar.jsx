@@ -1,22 +1,14 @@
-
-
-
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { FiLogOut, FiClock } from "react-icons/fi"; 
-import { MdAccountCircle } from "react-icons/md"; 
 import Logo from "./Logo";
 
 const Navbar = () => {
   const [currentDateTime, setCurrentDateTime] = useState("");
   const [userName, setUserName] = useState("");
 
-
   useEffect(() => {
     const storedUserName = localStorage.getItem("userName");
-    
+
     if (storedUserName) {
-      // setUserName(storedUserName);
       const firstName = storedUserName.split(" ")[0];
       setUserName(firstName);
     }
@@ -57,7 +49,11 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center space-x-2 text-sm text-gray-600">
-        <FiClock size={18} className="text-blue-600" />
+        <img
+          src={"../src/assets/clock.png"}
+          alt="Clock"
+          className="w-8 h-auto rounded"
+        />
         <span>{currentDateTime}</span>
       </div>
 
@@ -65,9 +61,8 @@ const Navbar = () => {
         <button
           onClick={handleLogout}
           className="flex items-center space-x-2 px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md shadow-md transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          <FiLogOut size={18} />
-          <span>Logout</span>
+        ><img src={'../src/assets/logout.png'} alt='Logout' className="w-8 h-auto" />
+          Logout
         </button>
       </div>
     </nav>
