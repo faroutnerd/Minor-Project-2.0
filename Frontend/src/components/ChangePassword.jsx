@@ -26,9 +26,9 @@ const ChangePassword = () => {
       return setError("Please enter a valid 10-digit phone number.");
     }
 
-    if (password !== confirmPassword) {
-      return setError("Passwords do not match.");
-    }
+    // if (password !== confirmPassword) {
+    //   return setError("Passwords do not match.");
+    // }
 
     if (password.length < 6) {
       return setError("Password must be at least 6 characters long.");
@@ -38,6 +38,7 @@ const ChangePassword = () => {
       const response = await axios.post("http://localhost:5000/change-password", {
         phone,
         newPassword: password,
+        confirmPassword: confirmPassword
       });
 
       setSuccess(response.data.message || "Password changed successfully.");
