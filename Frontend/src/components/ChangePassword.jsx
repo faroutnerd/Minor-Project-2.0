@@ -26,10 +26,6 @@ const ChangePassword = () => {
       return setError("Please enter a valid 10-digit phone number.");
     }
 
-    // if (password !== confirmPassword) {
-    //   return setError("Passwords do not match.");
-    // }
-
     if (password.length < 6) {
       return setError("Password must be at least 6 characters long.");
     }

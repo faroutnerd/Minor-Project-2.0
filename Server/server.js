@@ -79,7 +79,7 @@ app.post("/login", async (req, res) => {
     // Compare hashed password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({ message: "Incorrect Password" });
     }
 
     res.status(200).json({ userId: user.user_id, userName: user.name, message: "Login successful" });
@@ -88,7 +88,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Authenticate User (Security Question and Answer)
+// Authenticate User
 app.post("/authuser", async (req, res) => {
   try {
     const { phone, securityQuestion, securityAnswer } = req.body;

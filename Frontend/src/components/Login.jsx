@@ -14,6 +14,7 @@ const Login = () => {
         phone,
         password,
       });
+      // console.log(response)
       const user_id = response.data.userId;
       const userName = response.data.userName;
       localStorage.setItem("user_id", user_id);
