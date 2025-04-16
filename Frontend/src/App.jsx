@@ -5,7 +5,7 @@ import Login from "./components/Login";
 import ChangePassword from "./components/ChangePassword";
 import UserAuthentication from "./components/UserAuthentication";
 import Home from "./components/Home";
-// import NotFound from "./components/NotFound";
+import NotFound from "./components/NotFound";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
