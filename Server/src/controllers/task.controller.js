@@ -1,10 +1,13 @@
 import User from "../models/user.model.js";
 
-exports.getTasks = async (req, res) => {
+export const getTasks = async (req, res) => {
   try {
     const { user_id } = req.query;
     const user = await User.findOne({ user_id });
-    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
 
     res.json(user.tasks);
   } catch (err) {
@@ -12,11 +15,14 @@ exports.getTasks = async (req, res) => {
   }
 };
 
-exports.addTask = async (req, res) => {
+export const addTask = async (req, res) => {
   try {
     const { user_id, todo } = req.body;
+
     const user = await User.findOne({ user_id });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
 
     user.tasks.push({ todo });
     await user.save();
@@ -27,15 +33,20 @@ exports.addTask = async (req, res) => {
   }
 };
 
-exports.editTask = async (req, res) => {
+export const editTask = async (req, res) => {
   try {
     const { task_id } = req.params;
     const { user_id, todo, isCompleted } = req.body;
+
     const user = await User.findOne({ user_id });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
 
     const task = user.tasks.find((task) => task.task_id === task_id);
-    if (!task) return res.status(404).json({ message: "Task not found" });
+    if (!task) {
+      return res.status(404).json({ message: "Task not found." });
+    }
 
     if (todo !== undefined) task.todo = todo;
     if (isCompleted !== undefined) task.isCompleted = isCompleted;
@@ -47,13 +58,15 @@ exports.editTask = async (req, res) => {
   }
 };
 
-exports.deleteTask = async (req, res) => {
+export const deleteTask = async (req, res) => {
   try {
     const { task_id } = req.params;
     const { user_id } = req.body;
 
     const user = await User.findOne({ user_id });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
 
     user.tasks = user.tasks.filter((task) => task.task_id !== task_id);
     await user.save();

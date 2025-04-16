@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
 const userTaskSchema = new mongoose.Schema({
-  user_id: { type: String, default: () => uuidv4(), unique: true }, // Unique identifier for the user
+  user_id: { type: String, default: () => uuidv4(), unique: true },
   name: { type: String, required: true },
   phone: { type: String, unique: true, required: true },
   password: { type: String, required: true },
@@ -18,4 +18,4 @@ const userTaskSchema = new mongoose.Schema({
   ],
 });
 
-module.exports = mongoose.model("User", userTaskSchema);
+export default mongoose.model("User", userTaskSchema);
