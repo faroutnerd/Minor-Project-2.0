@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 
+// Show all tasks for a user
 export const getTasks = async (req, res) => {
   try {
     const { user_id } = req.query;
@@ -15,6 +16,7 @@ export const getTasks = async (req, res) => {
   }
 };
 
+// Add a new task for a user
 export const addTask = async (req, res) => {
   try {
     const { user_id, todo } = req.body;
@@ -33,6 +35,7 @@ export const addTask = async (req, res) => {
   }
 };
 
+// Edit an existing task for a user
 export const editTask = async (req, res) => {
   try {
     const { task_id } = req.params;
@@ -58,6 +61,7 @@ export const editTask = async (req, res) => {
   }
 };
 
+// Delete a task for a user
 export const deleteTask = async (req, res) => {
   try {
     const { task_id } = req.params;
@@ -71,7 +75,8 @@ export const deleteTask = async (req, res) => {
     user.tasks = user.tasks.filter((task) => task.task_id !== task_id);
     await user.save();
 
-    res.status(204).send();
+    res.status(204).json({ message: "Task deleted successfully." });
+    
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

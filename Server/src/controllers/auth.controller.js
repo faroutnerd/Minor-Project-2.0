@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 
+// This function handles user signup
 export const signup = async (req, res) => {
   try {
     const { name, phone, password, securityQuestion, securityAnswer } = req.body;
@@ -24,6 +25,7 @@ export const signup = async (req, res) => {
   }
 };
 
+// This function handles user login
 export const login = async (req, res) => {
   try {
     const { phone, password } = req.body;
@@ -43,6 +45,7 @@ export const login = async (req, res) => {
   }
 };
 
+// This function handles user authentication using security questions
 export const authUser = async (req, res) => {
   try {
     const { phone, securityQuestion, securityAnswer } = req.body;
@@ -68,6 +71,7 @@ export const authUser = async (req, res) => {
   }
 };
 
+// This function handles password change
 export const changePassword = async (req, res) => {
   try {
     const { phone, newPassword, confirmPassword } = req.body;
